@@ -4,6 +4,7 @@ import argparse
 import tensorflow as tf
 import pandas
 import numpy
+import helpers
 
 x=tf.placeholder(tf.float64,[None,290])
 y_=tf.placeholder(tf.float64)
@@ -40,9 +41,10 @@ def compute_loss(predictions,samples):
     return tf.reduce_sum(tf.pow(predictions-y_,2))/(2.0*samples)
 
 def train(generator,epochs):
+    estopper=helpers.EarlyStopper()
     predictions=compute_predictions(x)
     cost=compute_loss(predictions,batch_size)
-    optimizer=tf.train.AdagradOptimizer(0.1).minimize(cost)
+    optimizer=tf.train.AdagradOptimizer(1.0).minimize(cost)
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())
         epoch=0
@@ -51,8 +53,10 @@ def train(generator,epochs):
             x_train,y_train=next(generator)
             out,_cost=sess.run([optimizer,cost],feed_dict={x:x_train,y_:y_train})
             loss+=_cost
-            if epoch%100 == 0 and epoch!=0: 
+            if epoch%100 == 0 and epoch!=0:
                 print("Epoch: %d Loss: %s "%(epoch,str(loss/100.0)))
+                if estopper.early_stop(loss/100):
+                    break
                 loss=0
             epoch+=1
         print()
