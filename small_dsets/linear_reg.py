@@ -1,7 +1,7 @@
 import tensorflow as tf
 
-x=tf.placeholder(tf.float64,[None,290])
-y_=tf.placeholder(tf.float64)
+x=tf.placeholder(tf.float64,[None,290],name="input")
+y_=tf.placeholder(tf.float64,name="labels")
 
 def compute_predictions(x):
     W=tf.Variable(tf.random_normal([290,1],mean=0.0,stddev=1.0,dtype=tf.float64))

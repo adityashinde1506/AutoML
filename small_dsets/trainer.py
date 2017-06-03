@@ -33,6 +33,7 @@ def compute_mse_loss(predictions,samples):
 
 def train(generator,epochs,model,save_dir):
     estopper=helpers.EarlyStopper()
+    trn_progress=helpers.TrProgress()
     predictions=model.compute_predictions(model.x)
     cost=compute_mse_loss(predictions,batch_size)
     optimizer=tf.train.AdagradOptimizer(1.0).minimize(cost)
@@ -40,19 +41,13 @@ def train(generator,epochs,model,save_dir):
         sess.run(tf.global_variables_initializer())
         saver=tf.train.Saver()
         epoch=0
-        loss=0
         while epoch <= epochs:
             x_train,y_train=next(generator)
             out,_cost=sess.run([optimizer,cost],feed_dict={model.x:x_train,model.y_:y_train})
-            loss+=_cost
-            if epoch%100 == 0 and epoch!=0:
-                print("Epoch: %d Loss: %s "%(epoch,str(loss/100.0)))
-                if estopper.early_stop(loss/100):
-                    saver.save(sess,save_dir)
-                    break
-                loss=0
+            if trn_progress.check_progress(_cost,epoch):
+                break
             epoch+=1
-        print()
+        saver.save(sess,save_dir)
 
 def main():
     global batch_size

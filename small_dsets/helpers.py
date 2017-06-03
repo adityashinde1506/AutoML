@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+import time
+
 class EarlyStopper:
 
     def __init__(self,threshold=0.001):
@@ -29,13 +31,43 @@ class EarlyStopper:
             self.patience=5
             return False
 
+class PPrinter:
+
+    def __init__(self):
+        self.buffer=list()
+
+    def add_to_buffer(self,_string):
+        self.buffer.append(_string)
+
+    def pprint(self):
+        for _string in self.buffer:
+            print(_string,end=" ")
+        print()
+        self.buffer=list()
+
 class TrProgress:
 
     def __init__(self):
         self.loss=0
-        pass
+        self.estopper=EarlyStopper()
+        self.printer=PPrinter()
+        self.now=time.time()
 
     def check_progress(self,loss,epoch):
         self.loss+=loss
         if epoch%100==0 and epoch!=0:
-            pass
+            now=time.time()
+            self.printer.add_to_buffer("Epoch time: %s"%(str(int(now-self.now))))
+            self.now=now
+            self.printer.add_to_buffer("Epoch: %s Loss: %10s"%(epoch,self.loss/100.0))
+            self.printer.pprint()
+            if self.estopper.early_stop(self.loss/100.0):
+                return True
+            else:
+                self.loss=0
+                return False
+        else:
+            return False
+
+
+
