@@ -13,22 +13,6 @@ def load_dataset(input_csv):
     X=data.drop(data.columns[-1],axis=1).as_matrix().astype(numpy.float64)
     return X,target
 
-def batch_generator(X,y,size=1000):
-    i=0
-    while True:
-        if i > X.shape[0]:
-            i=0
-        batch_x=X[i:i+size]
-        batch_y=y[i:i+size]
-        if batch_x.shape[0]==size:
-            yield batch_x,batch_y
-        else:
-            difference=size-batch_x.shape[0]
-            batch_x=numpy.vstack((batch_x,X[:difference]))
-            batch_y=numpy.hstack((batch_y,y[:difference]))
-            yield batch_x,batch_y
-        i+=size
-
 def train(generator,epochs,model,save_dir):
     loss=losses.Loss()
     estopper=helpers.EarlyStopper()
@@ -61,7 +45,7 @@ def main():
     X,y=load_dataset(args.i)
     global model
     model=__import__(args.m)
-    generator=batch_generator(X,y,batch_size)
+    generator=helpers.batch_generator(X,y,batch_size)
     train(generator,int(args.e),model,args.s)
     
 

@@ -1,6 +1,6 @@
-#!/usr/bin/env python3
 
 import time
+import numpy
 
 class EarlyStopper:
 
@@ -69,5 +69,19 @@ class TrProgress:
         else:
             return False
 
-
+def batch_generator(X,y,size=1000):
+    i=0
+    while True:
+        if i > X.shape[0]:
+            i=0
+        batch_x=X[i:i+size]
+        batch_y=y[i:i+size]
+        if batch_x.shape[0]==size:
+            yield batch_x,batch_y
+        else:
+            difference=size-batch_x.shape[0]
+            batch_x=numpy.vstack((batch_x,X[:difference]))
+            batch_y=numpy.hstack((batch_y,y[:difference]))
+            yield batch_x,batch_y
+        i+=size
 
