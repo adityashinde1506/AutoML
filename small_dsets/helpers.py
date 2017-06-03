@@ -2,8 +2,8 @@
 
 class EarlyStopper:
 
-    def __init__(self,patience=5,threshold=0.001):
-        self.patience=patience
+    def __init__(self,threshold=0.001):
+        self.patience=5
         self.threshold=threshold
         self.window=list()
 
@@ -17,16 +17,25 @@ class EarlyStopper:
             self.__add_value(value)
             return False
         elif min(self.window)-value<self.threshold:
-            print(min(self.window)-value)
-            print("Patience decreased")
             self.patience-=1
             if not self.patience:
-
+                print("Early Stopping.")
                 return True
             else:
                 return False
         else:
-            print("min is %s and val is %s "%(str(min(self.window)),str(value)))
+#            print("min is %s and val is %s "%(str(min(self.window)),str(value)))
             self.__add_value(value)
             self.patience=5
             return False
+
+class TrProgress:
+
+    def __init__(self):
+        self.loss=0
+        pass
+
+    def check_progress(self,loss,epoch):
+        self.loss+=loss
+        if epoch%100==0 and epoch!=0:
+            pass
