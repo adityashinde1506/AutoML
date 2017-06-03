@@ -5,6 +5,7 @@ import tensorflow as tf
 import pandas
 import numpy
 import helpers
+import losses
 
 def load_dataset(input_csv):
     data=pandas.read_csv(input_csv)
@@ -28,14 +29,12 @@ def batch_generator(X,y,size=1000):
             yield batch_x,batch_y
         i+=size
 
-def compute_mse_loss(predictions,samples):
-    return tf.reduce_sum(tf.pow(predictions-model.y_,2))/(2.0*samples)
-
 def train(generator,epochs,model,save_dir):
+    loss=losses.Loss()
     estopper=helpers.EarlyStopper()
     trn_progress=helpers.TrProgress()
     predictions=model.compute_predictions(model.x)
-    cost=compute_mse_loss(predictions,batch_size)
+    cost=loss.mse_loss(predictions,model.y_,batch_size)
     optimizer=tf.train.AdagradOptimizer(1.0).minimize(cost)
     with tf.Session() as sess:
         sess.run(tf.global_variables_initializer())

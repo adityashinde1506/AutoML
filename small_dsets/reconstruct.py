@@ -4,7 +4,7 @@ import pandas
 import argparse
 #from sklearn.preprocessing import LabelEncoder,StandardScaler
 import shelve
-
+import tensorflow as tf
 
 def reconstruct(input_file,shelve_file):
     dataset=pandas.read_csv(input_file)
@@ -27,6 +27,10 @@ def reconstruct_labels(dataset,labels):
         if encoder != None:
             dataset[dataset.columns[i]]=labels[i].inverse_transform(dataset[dataset.columns[i]].apply(int))
     return dataset
+
+def load_model(session,model_file):
+    
+    
 
 def main():
     parser=argparse.ArgumentParser()
