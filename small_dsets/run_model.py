@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 
 import tensorflow as tf
-import pandas
 import argparse
+from dataops import DSetHandler
 
 def load_model(session,model_file):
     _file=model_file
@@ -10,19 +10,10 @@ def load_model(session,model_file):
     saver=tf.train.import_meta_graph(_file)
     saver.restore(session,tf.train.latest_checkpoint(_dir))
 
-def get_data(_file,test=True):
-    dataset=pandas.read_csv(_file)
-    orignal_data=dataset
-    if test:
-        targets=dataset[dataset.columns[-1]]
-        run_data=dataset.drop(dataset.columns[-1],axis=1)
-    else:
-        targets=None
-        run_data=orignal_data
-    return orignal_data,run_data.as_matrix(),targets.as_matrix()
-
 def run():
-    ref_data,run_data,labels=get_data(args.i)
+    datahandler=DSetHandler()
+    dset=datahandler.import_from_csv(args.i)
+    run_data,targets=datahandler.seperate_labels(dset)
     with tf.Session() as sess:
         load_model(sess,args.m)
         sess.run(tf.global_variables_initializer())
