@@ -6,11 +6,11 @@ import pandas
 import numpy
 import helpers
 import losses
+from dataops import DSetHandler
 
 def load_dataset(input_csv):
-    data=pandas.read_csv(input_csv)
-    target=data[data.columns[-1]].as_matrix().astype(numpy.float64)
-    X=data.drop(data.columns[-1],axis=1).as_matrix().astype(numpy.float64)
+    dset=DSetHandler()
+    X,target=dset.get_training_set(input_csv)
     return X,target
 
 def train(generator,epochs,model,save_dir):

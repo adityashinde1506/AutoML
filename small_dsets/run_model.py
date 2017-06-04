@@ -12,17 +12,16 @@ def load_model(session,model_file):
 
 def run():
     datahandler=DSetHandler()
-    dset=datahandler.import_from_csv(args.i)
-    run_data,targets=datahandler.seperate_labels(dset)
+    run_data=datahandler.get_testing_set(args.i)
     with tf.Session() as sess:
         load_model(sess,args.m)
-        sess.run(tf.global_variables_initializer())
+        #sess.run(tf.global_variables_initializer())
         graph=tf.get_default_graph()
         i=graph.get_tensor_by_name("input:0")
-        o=graph.get_tensor_by_name("labels:0")
         predictions=graph.get_tensor_by_name("prediction:0")
         result=sess.run(predictions,{i:run_data})
         print(result)
+    return result
 
 def main():
     parser=argparse.ArgumentParser()
@@ -30,7 +29,7 @@ def main():
     parser.add_argument("-i",help="input data file.")
     global args
     args=parser.parse_args()
-    run()
+    print(run())
     
 
 main()
