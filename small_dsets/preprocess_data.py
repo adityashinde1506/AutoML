@@ -2,7 +2,7 @@
 
 import pandas
 import argparse
-from dataops import DSetHandler
+from lib.dataops import DSetHandler
 
 def preprocess_data(input_file,output_path):
     dsethandler=DSetHandler()

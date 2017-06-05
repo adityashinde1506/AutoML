@@ -4,9 +4,10 @@ import argparse
 import tensorflow as tf
 import pandas
 import numpy
-import helpers
-import losses
-from dataops import DSetHandler
+import importlib
+from lib import helpers
+from lib import losses
+from lib.dataops import DSetHandler
 
 def load_dataset(input_csv):
     dset=DSetHandler()
@@ -44,7 +45,7 @@ def main():
     batch_size=int(args.b)
     X,y=load_dataset(args.i)
     global model
-    model=__import__(args.m)
+    model=importlib.import_module(args.m)
     generator=helpers.batch_generator(X,y,batch_size)
     train(generator,int(args.e),model,args.s)
     

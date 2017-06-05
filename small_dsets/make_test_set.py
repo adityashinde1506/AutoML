@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 
 import argparse
-from dataops import DSetHandler
+from lib.dataops import DSetHandler
 
 def run():
     dset=DSetHandler()

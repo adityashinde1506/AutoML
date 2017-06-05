@@ -2,8 +2,8 @@
 
 import argparse
 import pandas
-from reconstruct import Reconstructor
-from dataops import DSetHandler
+from lib.reconstruct import Reconstructor
+from lib.dataops import DSetHandler
 
 parser=argparse.ArgumentParser()
 parser.add_argument("-t",help="path to test file.")

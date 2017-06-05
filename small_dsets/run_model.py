@@ -2,7 +2,7 @@
 
 import tensorflow as tf
 import argparse
-from dataops import DSetHandler
+from lib.dataops import DSetHandler
 import pandas
 
 def load_model(session,model_file):
