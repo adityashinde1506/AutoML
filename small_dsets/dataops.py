@@ -26,21 +26,36 @@ class DSetHandler:
     def __get_column_dtypes(self,dataframe):
         return list(map(lambda x:dataframe[x].dtype,dataframe.columns))
 
-    def process_labels(self,dataframe):
-        dtypes=self.__get_column_dtypes(dataframe)
-        label_transform=list()
-        for i in range(len(dtypes)):
-            if dtypes[i]=="object":
-                ltransform=LabelEncoder()
-                dataframe[dataframe.columns[i]]=ltransform.fit_transform(dataframe[dataframe.columns[i]].apply(str))
-                label_transform.append(ltransform)
+    def __make_new_label_frame(self,dframe):
+        frame=list()
+        for i in range(len(dframe.columns)):
+            if dframe[dframe.columns[i]].dtype=="object":
+                frame.append(LabelEncoder())
             else:
-                label_transform.append(None)
-        return dataframe,label_transform
+                frame.append(None)
+        return frame
 
-    def rescale(self,dframe):
-        scaler=StandardScaler()
-        dframe=pandas.DataFrame(scaler.fit_transform(dframe),columns=dframe.columns)
+    def __make_new_scaler_frame(self):
+        return StandardScaler()
+
+    def apply_label_frame(self,dataset,frame):
+        assert len(dataset.columns)==len(frame)
+        for i in range(len(frame)):
+            if frame[i]!=None:
+                dataset[dataset.columns[i]]=frame[i].fit_transform(dataset[dataset.columns[i]].apply(str))
+        return dataset
+
+    def apply_scaler_frame(self,dataset,scaler_frame):
+        return pandas.DataFrame(scaler_frame.fit_transform(dataset),columns=dataset.columns)
+
+    def process_labels(self,dataframe):
+        labels_frame=self.__make_new_label_frame(dataframe)
+        dataframe=self.apply_label_frame(dataframe,labels_frame)
+        return dataframe,labels_frame
+
+    def rescale(self,dataframe):
+        scaler=self.__make_new_scaler_frame()
+        dframe=self.apply_scaler_frame(dataframe,scaler)
         return dframe,scaler
 
     def write_data(self,dframe,labels,scaler,output):
@@ -51,6 +66,12 @@ class DSetHandler:
         metadata["scaler"]=scaler
         metadata["id"]=self.ids
         metadata.close()
+
+    def apply_meta(self,dataframe,labels,scaler,meta_path):
+        ids,scaler_frame,labels_frame=self.read_meta_file(meta_path)
+        dataframe=self.apply_labels_frame(dataframe,labels_frame)
+        dataframe=self.apply_scaler_frame(dataframe,scaler_frame)
+        return dataframe
 
     def preprocess_with_labels(self,dataframe,output_path):
         dframe,self.ltransform=self.process_labels(dataframe)
@@ -72,5 +93,9 @@ class DSetHandler:
         dframe=dframe.drop(dframe.columns[0],axis=1)
         return dframe.as_matrix()
 
-
-
+    def read_meta_file(self,meta_file):
+        metadata=shelve.open(meta_file)
+        labels=metadata["labels"]
+        scaler=metadata["scaler"]
+        ids=metadata["id"]
+        return ids,scaler,labels
