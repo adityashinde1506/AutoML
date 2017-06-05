@@ -3,6 +3,7 @@
 import tensorflow as tf
 import argparse
 from dataops import DSetHandler
+import pandas
 
 def load_model(session,model_file):
     _file=model_file
@@ -20,16 +21,16 @@ def run():
         i=graph.get_tensor_by_name("input:0")
         predictions=graph.get_tensor_by_name("prediction:0")
         result=sess.run(predictions,{i:run_data})
-        print(result)
     return result
 
 def main():
     parser=argparse.ArgumentParser()
     parser.add_argument("-m",help="model file.")
     parser.add_argument("-i",help="input data file.")
+    parser.add_argument("-o",help="path to store results.")
     global args
     args=parser.parse_args()
-    print(run())
-    
+    result=run()
+    pandas.DataFrame(result,columns=["results"]).to_csv(args.o+"results.csv")
 
 main()
