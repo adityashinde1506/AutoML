@@ -9,7 +9,7 @@ class DSetHandler:
 
     def import_from_csv(self,csv_path,store_id=1):
         if store_id:
-            dset=pandas.read_csv(csv_path).fillna(0)
+            dset=pandas.read_csv(csv_path).fillna(method="bfill").fillna(method="ffill")
             self.ids=dset["id"]
             return dset.drop("id",axis=1)
         else:
@@ -38,15 +38,21 @@ class DSetHandler:
     def __make_new_scaler_frame(self):
         return StandardScaler()
 
-    def apply_label_frame(self,dataset,frame):
+    def apply_label_frame(self,dataset,frame,fit=1):
         assert len(dataset.columns)==len(frame)
         for i in range(len(frame)):
             if frame[i]!=None:
-                dataset[dataset.columns[i]]=frame[i].fit_transform(dataset[dataset.columns[i]].apply(str))
+                if fit:
+                    dataset[dataset.columns[i]]=frame[i].fit_transform(dataset[dataset.columns[i]].apply(str))
+                else:
+                    dataset[dataset.columns[i]]=frame[i].transform(dataset[dataset.columns[i]].apply(str))
         return dataset
 
-    def apply_scaler_frame(self,dataset,scaler_frame):
-        return pandas.DataFrame(scaler_frame.fit_transform(dataset),columns=dataset.columns)
+    def apply_scaler_frame(self,dataset,scaler_frame,fit=1):
+        if fit:
+            return pandas.DataFrame(scaler_frame.fit_transform(dataset),columns=dataset.columns)
+        else:
+            return pandas.DataFrame(scaler_frame.transform(dataset),columns=dataset.columns)
 
     def process_labels(self,dataframe):
         labels_frame=self.__make_new_label_frame(dataframe)
@@ -67,10 +73,10 @@ class DSetHandler:
         metadata["id"]=self.ids
         metadata.close()
 
-    def apply_meta(self,dataframe,labels,scaler,meta_path):
+    def apply_meta(self,dataframe,meta_path):
         ids,scaler_frame,labels_frame=self.read_meta_file(meta_path)
-        dataframe=self.apply_labels_frame(dataframe,labels_frame)
-        dataframe=self.apply_scaler_frame(dataframe,scaler_frame)
+        dataframe=self.apply_label_frame(dataframe,labels_frame,0)
+        dataframe=self.apply_scaler_frame(dataframe,scaler_frame,0)
         return dataframe
 
     def preprocess_with_labels(self,dataframe,output_path):
