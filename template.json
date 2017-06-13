@@ -1,0 +1,21 @@
+[{
+    "name":"source",
+    "desc":{
+        "type":"csv_source",
+        "args":{
+            "files":["/home/adityas/Kaggle/datasets/weather/weather.csv"],
+            "batch_size":100000
+            }
+        }
+    },
+    {
+        "name":"preprocessing",
+        "desc":{
+            "type":"preprocessing",
+            "args":{
+                "components":["standard","min_max"],
+                "args":[{},{}]
+                }
+            }
+        }
+]
