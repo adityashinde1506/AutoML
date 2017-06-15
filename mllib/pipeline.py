@@ -3,29 +3,32 @@ import json
 
 class Pipeline:
 
-    block_type={"csv_source":CSVSourceBlock,"preprocessing":PreprocessBlock}
+    block_type={"csv_source":CSVSourceBlock}
 
     def __init__(self,filename):
-        self.blocks=list()
         self.specs=json.load(open(filename))
-        self.__init_blocks(self.specs)
+        self.__init_source(self.specs["source"])
+        self.__init_filter(self.specs["filter"])
+        self.__init_preprocess(self.specs["preprocess"])
+        self.__init_model(self.specs["model"])
+    
+    def __init_source(self,config):
+        self.source=self.block_type[config["type"]](**config["args"])
 
-    def __init_block(self,arg_dict):
-        block_type=arg_dict["type"]
-        args=arg_dict["args"]
-        self.blocks.append(self.block_type[block_type](**args))
+    def __init_filter(self,config):
+        self.filter=ColumnFilter(config["columns"])
 
-    def __init_blocks(self,blocks):
-        for block in blocks:
-            self.__init_block(block["desc"])
+    def __init_preprocess(self,config):
+        self.preprocess=PreprocessBlock(**config)
 
-    def train_run(self):
-        data=self.blocks[0].run()
-        for block in self.blocks[1:]:
-            data=block.run(data,"train")
+    def __init_model(self,config):
+        self.model=ModelBlock(**config,data_source=self.run_data_section)
+
+    def run_data_section(self,state="train"):
+        data=self.source.run()
+        data=self.filter.run(data)
+        data=self.preprocess.run(data,state)
         return data
 
-    def debug(self):
-        print(self.blocks)
-        for block in self.blocks[1:]:
-            block.show_components()
+    def train(self):
+        self.model.run("train")

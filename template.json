@@ -1,21 +1,24 @@
-[{
-    "name":"source",
-    "desc":{
-        "type":"csv_source",
-        "args":{
-            "files":["/home/adityas/Kaggle/datasets/weather/weather.csv"],
-            "batch_size":100000
-            }
-        }
+{
+    "source":{
+                "type":"csv_source",
+                "args":{
+                        "files":["/home/adityas/Kaggle/datasets/weather/weather.csv"],
+                        "batch_size":100000
+                }
     },
-    {
-        "name":"preprocessing",
-        "desc":{
-            "type":"preprocessing",
-            "args":{
+    "preprocess":{
                 "components":["standard","min_max"],
                 "args":[{},{}]
-                }
-            }
-        }
-]
+    },
+    "filter":{
+                "columns":["Id"]
+    },
+    "model":{
+                "model":{
+                        "model_type":"sklearn",
+                        "specs":"sklearn.linear_model.SGDRegressor"
+                },
+                "target_attr":"Solar",
+                "epochs":10000
+    }
+}

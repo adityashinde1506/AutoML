@@ -13,6 +13,7 @@ parser.add_argument("-s",help="specifications file.")
 args=parser.parse_args()
 
 pipeline=Pipeline(args.s)
-res=pipeline.train_run()
-print(res)
+pipeline.train()
+#print(res)
+
 #pipeline.debug()
