@@ -12,9 +12,9 @@ class Dataset(object):
     def __init__(self,files,delimiter=",",chunk=None):
         logger.debug("Creating data iterators")
         if delimiter==" ":
-            self.data_iterators=list(map(lambda x:pandas.read_csv(x,delim_whitespace=True,index_col=False,header=None,iterator=True,chunksize=None),files))
+            self.data_iterators=list(map(lambda x:pandas.read_csv(x,delim_whitespace=True,index_col=False,header=None,iterator=True,chunksize=chunk),files))
         else:
-            self.data_iterators=list(map(lambda x:pandas.read_csv(x,delimiter=delimiter,index_col=False,header=None,iterator=True,chunksize=None),files))
+            self.data_iterators=list(map(lambda x:pandas.read_csv(x,delimiter=delimiter,index_col=False,header=None,iterator=True,chunksize=chunk),files))
         logger.debug("Iterators created.")
         logger.info("Dataset loaded.")
 
