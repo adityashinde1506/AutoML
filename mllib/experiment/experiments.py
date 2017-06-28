@@ -17,29 +17,30 @@ class Experiment(object):
     """
 
     def __init__(self,model,datasource,metric,trials=30):
-        dataset=datasource.get_dataset()
+        self.dataset=datasource
         self.source=str(datasource)
         del datasource
-        train=dataset["train"]
-        test=dataset["test"]
         self.model=model
-        self.train_X=train[0]
-        self.train_y=train[1]
-        self.test_X=test[0]
-        self.test_y=test[1]
         self.metric=metric
         self.trials=trials
         self.scores=list()
 
-    def single_run(self):
-        self.model.fit(self.train_X,self.train_y)
-        predictions=self.model.predict(self.test_X)
-        return self.metric(self.test_y,predictions)
+    def single_run(self,train_X,train_y,test_X,test_y):
+        self.model.fit(train_X,train_y)
+        predictions=self.model.predict(test_X)
+        return self.metric(test_y,predictions)
 
-    def run_experiment(self):
+    def run_experiment(self):        
+        dataset=self.dataset.get_dataset()
+        train=dataset["train"]
+        test=dataset["test"]
+        train_X=train[0]
+        train_y=train[1]
+        test_X=test[0]
+        test_y=test[1]
         logger.info("Starting experiment.")
         for i in range(self.trials):
-            score=self.single_run()
+            score=self.single_run(train_X,train_y,test_X,test_y)
             logger.debug("Trial: {} metric: {}".format(i,score))
             self.scores.append(score)
         mean_score=numpy.array(self.scores).mean()
