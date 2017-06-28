@@ -39,7 +39,7 @@ class Datasource(object):
         self.sets={"train":(X_train,y_train),"test":(X_test,y_test)}
         logger.debug("Datasets prepared.")
 
-    def get_dataset(self,set_type="train"):
+    def get_dataset(self):
         if self.IN_MEM:
             logger.debug("Getting full dataset.")
             data=self.dataset.collect()
@@ -50,4 +50,15 @@ class Datasource(object):
             return self.sets
         else:
             # TODO: return batches of data.
+            return None
+
+    def get_dataset_asframe(self):
+        if self.IN_MEM:
+            logger.debug("Getting dataframe")
+            data=self.dataset.collect()
+            data.columns=self.headers
+            data=self.__remove_cols(data)
+            return data
+        else:
+            # TODO: return batch
             return None
