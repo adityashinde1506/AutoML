@@ -8,11 +8,12 @@ logger=logging.getLogger(__name__)
 
 class Datasource(object):
 
-    def __init__(self,files,headers,delimiter=",",chunk=None,remove_cols=[],remove_ind=[],test_split=0.3,target_col="y"):
+    def __init__(self,files,headers,delimiter=",",chunk=None,remove_cols=[],remove_ind=[],transforms=[],test_split=0.3,target_col="y"):
         self.dataset=Dataset(files,delimiter=delimiter,chunk=chunk)
         self.remove_cols=remove_cols
         self.remove_ind=remove_ind
         self.headers=headers
+        self.transforms=transforms
         if chunk==None:
             self.IN_MEM=True
         else:
@@ -34,6 +35,12 @@ class Datasource(object):
         X=dataframe.drop(self.target,axis=1).as_matrix()
         return X,y
 
+    def __apply_transforms(self,frame):
+        for transform in self.transforms:
+            logger.debug("Applying transform {}".format(str(transform)))
+            frame=transform(frame)
+        return frame
+
     def prepare_sets(self,X,y):
         X_train,X_test,y_train,y_test=train_test_split(X,y,test_size=self.split,random_state=42)
         self.sets={"train":(X_train,y_train),"test":(X_test,y_test)}
@@ -44,6 +51,7 @@ class Datasource(object):
             logger.debug("Getting full dataset.")
             data=self.dataset.collect()
             data.columns=self.headers
+            data=self.__apply_transforms(data)
             data=self.__remove_cols(data)
             X,y=self.__get_data_matrices(data)
             self.prepare_sets(X,y)
@@ -57,6 +65,7 @@ class Datasource(object):
             logger.debug("Getting dataframe")
             data=self.dataset.collect()
             data.columns=self.headers
+            data=self.__apply_transforms(data)
             data=self.__remove_cols(data)
             return data
         else:
