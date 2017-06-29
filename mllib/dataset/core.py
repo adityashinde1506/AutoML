@@ -10,7 +10,7 @@ class Dataset(object):
     """
 
     def __init__(self,files,delimiter=",",chunk=None):
-        logger.debug("Creating data iterators")
+        logger.debug("Creating data iterators from files: {}".format(",".join(files)))
         if delimiter==" ":
             self.data_iterators=list(map(lambda x:pandas.read_csv(x,delim_whitespace=True,index_col=False,header=None,iterator=True,chunksize=chunk),files))
         else:
