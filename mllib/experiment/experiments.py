@@ -16,7 +16,7 @@ class Experiment(object):
     trials - number of trials.
     """
 
-    def __init__(self,model,datasource,metric,trials=30):
+    def __init__(self,model,datasource,metric,trials=30,name="Unnamed experiment"):
         self.dataset=datasource
         self.source=str(datasource)
         del datasource
@@ -24,6 +24,7 @@ class Experiment(object):
         self.metric=metric
         self.trials=trials
         self.scores=list()
+        self.name=name
 
     def single_run(self,train_X,train_y,test_X,test_y):
         self.model.fit(train_X,train_y)
@@ -38,17 +39,17 @@ class Experiment(object):
         train_y=train[1]
         test_X=test[0]
         test_y=test[1]
-        logger.info("Starting experiment.")
+        logger.info("Starting experiment :{}.".format(self.name))
         for i in range(self.trials):
             score=self.single_run(train_X,train_y,test_X,test_y)
             logger.debug("Trial: {} metric: {}".format(i,score))
             self.scores.append(score)
         mean_score=numpy.array(self.scores).mean()
-        logger.info("Finished experiment. Mean Metric for {} trials is {}".format(self.trials,mean_score))
+        logger.info("Finished experiment {}. Mean Metric for {} trials is {}".format(self.name,self.trials,mean_score))
         return numpy.array(self.scores),mean_score
 
     def __str__(self):
-        desc="Experiment: MODEL:{} METRIC:{} TRIALS:{} DATA:{}".format(str(self.model),str(self.metric),self.trials,self.source)
+        desc="Experiment: NAME:{} MODEL:{} METRIC:{} TRIALS:{} DATA:{}".format(self.name,str(self.model),str(self.metric),self.trials,self.source)
         return desc
 
 
