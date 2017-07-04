@@ -9,13 +9,12 @@ logger=logging.getLogger(__name__)
 
 class Datasource(object):
 
-    def __init__(self,files,headers,delimiter=",",chunk=None,remove_cols=[],remove_ind=[],transforms=[],test_split=0.3,target_col="y",scaler=None):
+    def __init__(self,files,headers,delimiter=",",chunk=None,remove_cols=[],remove_ind=[],transforms=[],test_split=0.3,target_col="y"):
         self.dataset=Dataset(files,delimiter=delimiter,chunk=chunk)
         self.remove_cols=remove_cols
         self.remove_ind=remove_ind
         self.headers=headers
         self.transforms=transforms
-        self.scaler=scaler
         if chunk==None:
             self.IN_MEM=True
         else:
@@ -43,13 +42,6 @@ class Datasource(object):
             frame=transform(frame)
         return frame
 
-    def __apply_scaling(self,X,y):
-        logger.debug("Scaling data using {}".format(str(self.scaler)))
-        data=numpy.hstack((X,y.reshape(-1,1)))
-        t_data=self.scaler.fit_transform(data)
-        t_X,t_y=numpy.hsplit(t_data,[t_data.shape[1]-1])
-        return t_X,t_y.reshape(-1)
-
     def prepare_sets(self,X,y):
         X_train,X_test,y_train,y_test=train_test_split(X,y,test_size=self.split,random_state=42)
         self.sets={"train":(X_train,y_train),"test":(X_test,y_test)}
@@ -63,8 +55,6 @@ class Datasource(object):
             data=self.__apply_transforms(data)
             data=self.__remove_cols(data)
             X,y=self.__get_data_matrices(data)
-            if self.scaler != None:
-                X,y=self.__apply_scaling(X,y)
             self.prepare_sets(X,y)
             return self.sets
         else:
