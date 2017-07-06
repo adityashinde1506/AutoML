@@ -1,6 +1,6 @@
 import logging
 import numpy
-
+import json
 
 logger=logging.getLogger(__name__)
 
@@ -59,6 +59,7 @@ class Experiment(object):
             logger.debug("Trial: {} metric: {}".format(i,score))
             self.scores.append(score)
         mean_score=numpy.array(self.scores).mean()
+        logger.info("Experiment {} scores: {}".format(self.name,json.dumps(self.scores)))
         logger.info("Finished experiment {}. Mean Metric for {} trials is {}".format(self.name,self.trials,mean_score))
         return numpy.array(self.scores),mean_score
 

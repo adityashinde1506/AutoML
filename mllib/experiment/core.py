@@ -1,4 +1,5 @@
 from .experiments import *
+from .report import Report
 import logging
 
 logger=logging.getLogger(__name__)
@@ -6,6 +7,7 @@ logger=logging.getLogger(__name__)
 class MetaExperiment(object):
 
     def __init__(self,experiments):
+        self.report=Report()
         logger.info("Starting experiments.")
         self.results=list()
         for name,experiment in experiments:
@@ -15,5 +17,6 @@ class MetaExperiment(object):
         self.generate_report()
 
     def generate_report(self):
-        for name,_,mean in self.results:
-            logger.info("Experiment {} mean metric {}".format(name,mean))
+        for name,trials,mean in self.results:
+            self.report.add_result(name,trials,mean)
+        self.report.run_tests()
