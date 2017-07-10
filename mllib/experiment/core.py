@@ -10,10 +10,10 @@ class MetaExperiment(object):
         self.report=Report()
         logger.info("Starting experiments.")
         self.results=list()
-        for name,experiment in experiments:
-            logger.debug("Running experiment NAME:{} DESC:{}".format(name,str(experiment)))
+        for experiment in experiments:
+            logger.debug("Running experiment NAME:{} DESC:{}".format(experiment.name,str(experiment)))
             scores,mean=experiment.run_experiment()
-            self.results.append((name,scores,mean))
+            self.results.append((experiment.name,scores,mean))
         self.generate_report()
 
     def generate_report(self):
