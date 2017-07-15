@@ -1,5 +1,6 @@
 from scipy import stats
 import numpy
+import json
 
 import logging
 
@@ -28,5 +29,7 @@ class Report(object):
                                         self.experiments[self.individuals[i]]["trials"],
                                         self.experiments[self.individuals[j]]["trials"])[0]
         logger.info("ttests completed.")
-        print(ttest_results)
+        results=ttest_results.tolist()
+        for i in range(len(results)):
+            logger.info("Result {}:{}".format(i,json.dumps(results[i])))
         
