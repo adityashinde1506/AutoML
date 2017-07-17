@@ -47,11 +47,14 @@ class Datasource(object):
         max_roll=0
         for col,steps in self.rolls:
             logger.debug("Rolling {} by {}.".format(col,steps))
-            if steps>max_roll:
+            if (steps>max_roll and steps > 0) or (steps<max_roll and steps < 0):
                 max_roll=steps
             frame[col]=frame[col].shift(steps)
         logger.debug("Removing {} rows to compensate for roll.".format(max_roll))
-        return frame[max_roll:]
+        if max_roll >= 0:
+            return frame[max_roll:]
+        if max_roll < 0:
+            return frame[:frame.shape[0]+max_roll]
 
     def prepare_sets(self,X,y):
         X_train,X_test,y_train,y_test=train_test_split(X,y,test_size=self.split,random_state=42)

@@ -32,4 +32,5 @@ class Report(object):
         results=ttest_results.tolist()
         for i in range(len(results)):
             logger.info("Result {}:{}".format(i,json.dumps(results[i])))
+        print(ttest_results)
         
