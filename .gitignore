@@ -1,2 +1,7 @@
+<<<<<<< HEAD
 *.pyc
 *.pyx
+=======
+20_newsgroups/
+*.swp
+>>>>>>> 1e9b2e3007799c4cd876442edaa5b08bbd9eb29f
