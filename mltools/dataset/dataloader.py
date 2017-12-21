@@ -63,9 +63,9 @@ def split_files_into_datasets(groups):
     assert type(groups)==dict,"Groups should be dict of format {label1:iterator1,label2:iterator2}"
 
     for label,iterator in groups.items():
-        iter_len=len(list(iterator))
-        train_len=0.5*iter_len
-        test_len=val_len=0.25*iter_len
+        iter_len=len(iterator)
+        train_len=int(0.5*iter_len)
+        test_len=val_len=int(0.25*iter_len)
         groups[label]={"train":islice(iterator,0,train_len),
                         "val":islice(iterator,train_len,train_len+val_len),
                         "test":islice(iterator,train_len+val_len,None)}

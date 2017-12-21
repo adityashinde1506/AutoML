@@ -27,4 +27,4 @@ class TestDirLoader(unittest.TestCase):
         grouper=group_filenames(["Aggregation","Collection","Broadcast","Consensus","DGD"])
         data_groups=grouper(files)
         dataset=split_files_into_datasets(data_groups) 
-        print(dataset)
+        self.assertEqual(len(dataset),6)
